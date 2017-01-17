@@ -8,10 +8,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import java.io.IOException;
+import java.lang.annotation.Annotation;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Converter;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import todoexpert.lesiecki.com.todoexpert.api.ToDoApi;
+import todoexpert.lesiecki.com.todoexpert.api.UserResponse;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends AppCompatActivity {
@@ -68,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login(String username, String password) {
-        AsyncTask<String, Integer, Boolean > asyncTask = new AsyncTask<String, Integer, Boolean>() {
+        AsyncTask<String, Integer, String > asyncTask = new AsyncTask<String, Integer, String>() {
             /*
             Method runs before executing code
              */
@@ -79,11 +94,13 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            protected void onPostExecute(Boolean valid) {
-                super.onPostExecute(valid);
+            protected void onPostExecute(String errormessage) {
+                super.onPostExecute(errormessage);
                 loginButton.setEnabled(true);
-                if(valid){
+                if(errormessage == null){
                     finish();
+                }else{
+                    Toast.makeText(LoginActivity.this, errormessage, Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -94,16 +111,36 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            protected Boolean doInBackground(final String... params) {
-                for (int i = 0; i < 100; i++) {
-                    try {
-                        Thread.sleep(50);
-                        publishProgress(i);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+            protected String doInBackground(final String... params) {
+                HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+                interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .addInterceptor(interceptor)
+                        .build();
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("https://parseapi.back4app.com")
+                        .client(client)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                Converter<ResponseBody, ErrorResponse> converter = retrofit.responseBodyConverter(ErrorResponse.class, new Annotation[0]);
+
+                ToDoApi toDoApi = retrofit.create(ToDoApi.class);
+                Call<UserResponse> login = toDoApi.login(params[0], params[1]);
+                try {
+                    Response<UserResponse> userResponse = login.execute();
+                    if(userResponse.isSuccessful()){
+                        //TODO
+                        return null;
+                    } else {
+                        ErrorResponse errorResponse = converter.convert(userResponse.errorBody());
+                        return errorResponse.getError();
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return e.getMessage();
                 }
-                return params[0].equals("testxx") && params[1].equals("testxx");
             }
         };
         asyncTask.execute(username, password);

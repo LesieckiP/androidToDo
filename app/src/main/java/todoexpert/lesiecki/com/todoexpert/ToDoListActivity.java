@@ -1,9 +1,11 @@
 package todoexpert.lesiecki.com.todoexpert;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -54,8 +56,18 @@ public class ToDoListActivity extends AppCompatActivity {
             case R.id.action_refresh:
                 break;
             case R.id.action_logout:
-                finish();
-                break;
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Logout");
+                builder.setMessage("Are you sure?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
+                builder.setCancelable(false);
+                builder.create().show();
         }
         return super.onOptionsItemSelected(item);
     }
