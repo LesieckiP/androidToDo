@@ -19,4 +19,7 @@
     <string name="refresh">Refresh</string>
     <string name="add">Add</string>
     <string name="logout">Logout</string>
+    <string name="add_to_do">Add To do</string>
+    <string name="done">Done</string>
+    <string name="what_to_do">What to do?</string>
 </resources>

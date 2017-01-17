@@ -1,5 +1,6 @@
 package todoexpert.lesiecki.com.todoexpert;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -39,6 +40,8 @@ public class ToDoListActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_add:
+                Intent intent = new Intent(this, AddToDoActivity.class);
+                startActivity(intent);
                 break;
             case R.id.action_refresh:
                 break;
