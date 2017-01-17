@@ -1,14 +1,20 @@
 package todoexpert.lesiecki.com.todoexpert;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -25,6 +31,7 @@ import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import todoexpert.lesiecki.com.todoexpert.api.ErrorResponse;
 import todoexpert.lesiecki.com.todoexpert.api.ToDoApi;
 import todoexpert.lesiecki.com.todoexpert.api.UserResponse;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -82,7 +89,73 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void login(String username, String password) {
+    private void login(
+            final String username,
+            final String password
+    ) {
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(interceptor)
+                .build();
+
+        Gson gson = new GsonBuilder()
+        //TODO setup gson
+                .create();
+
+        final Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://parseapi.back4app.com")
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        Converter<ResponseBody, ErrorResponse> converter
+                = retrofit.responseBodyConverter(ErrorResponse.class, new Annotation[0]);
+
+        ToDoApi todoApi = retrofit.create(ToDoApi.class);
+        Call login = todoApi.login(username, password);
+
+        login.enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(
+                    final Call<UserResponse> call,
+                    final Response<UserResponse> response
+            ) {
+                if(response.isSuccessful()){
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("token", response.body().getSessionToken());
+                    editor.apply();
+
+                    Intent intent = new Intent(LoginActivity.this, ToDoListActivity.class);
+                    startActivity(intent);
+                    finish();
+
+                }else{
+                    Converter<ResponseBody, ErrorResponse> converter
+                            = retrofit.responseBodyConverter(ErrorResponse.class, new Annotation[0]);
+                    try {
+                        ErrorResponse errorResponse = converter.convert(response.errorBody());
+                        Toast.makeText(LoginActivity.this, errorResponse.getError(), Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(
+                    final Call<UserResponse> call,
+                    final Throwable t
+            ) {
+                Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void loginWithAsyncTask(String username, String password) {
         AsyncTask<String, Integer, String > asyncTask = new AsyncTask<String, Integer, String>() {
             /*
             Method runs before executing code
@@ -131,7 +204,6 @@ public class LoginActivity extends AppCompatActivity {
                 try {
                     Response<UserResponse> userResponse = login.execute();
                     if(userResponse.isSuccessful()){
-                        //TODO
                         return null;
                     } else {
                         ErrorResponse errorResponse = converter.convert(userResponse.errorBody());
