@@ -15,4 +15,8 @@
         <item quantity="one">%d kaczki</item>
         <item quantity="few">%d kaczek</item>
     </plurals>
+    <string name="title_activity_to_do_list">ToDoListActivity</string>
+    <string name="refresh">Refresh</string>
+    <string name="add">Add</string>
+    <string name="logout">Logout</string>
 </resources>
