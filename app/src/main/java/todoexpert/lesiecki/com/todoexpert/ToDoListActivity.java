@@ -13,6 +13,9 @@ import android.view.View;
 
 public class ToDoListActivity extends AppCompatActivity {
 
+    public static final String TODO_EXTRA ="todo test";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,9 +41,10 @@ public class ToDoListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_add:
                 Intent intent = new Intent(this, AddToDoActivity.class);
+                intent.putExtra(TODO_EXTRA, new Todo("task", true));
                 startActivity(intent);
                 break;
             case R.id.action_refresh:
