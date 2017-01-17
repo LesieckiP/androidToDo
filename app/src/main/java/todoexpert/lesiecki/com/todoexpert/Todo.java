@@ -26,8 +26,18 @@ public class Todo implements Serializable{
     public boolean isDone() {
         return done;
     }
-
     public void setDone(boolean done) {
         this.done = done;
     }
+
+
+    @Override
+    public String toString() {
+        return "Todo{" +
+                "content='" + content + '\'' +
+                ", done=" + done +
+                '}';
+    }
+
+
 }

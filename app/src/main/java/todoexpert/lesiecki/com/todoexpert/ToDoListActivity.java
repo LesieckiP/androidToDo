@@ -10,10 +10,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
+import java.io.Serializable;
 
 public class ToDoListActivity extends AppCompatActivity {
 
-    public static final String TODO_EXTRA ="todo test";
+    public static final String TODO_EXTRA ="todo";
+    public static final int REQUEST_CODE = 123;
 
 
     @Override
@@ -45,7 +49,7 @@ public class ToDoListActivity extends AppCompatActivity {
             case R.id.action_add:
                 Intent intent = new Intent(this, AddToDoActivity.class);
                 intent.putExtra(TODO_EXTRA, new Todo("task", true));
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE);
                 break;
             case R.id.action_refresh:
                 break;
@@ -54,5 +58,15 @@ public class ToDoListActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+            Todo todo = (Todo) data.getSerializableExtra(TODO_EXTRA);
+            Toast.makeText(this, "Result: " + resultCode + todo, Toast.LENGTH_SHORT).show();
+        }
     }
 }

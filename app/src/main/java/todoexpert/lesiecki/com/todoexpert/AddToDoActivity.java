@@ -1,5 +1,6 @@
 package todoexpert.lesiecki.com.todoexpert;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
@@ -9,6 +10,7 @@ import android.widget.RelativeLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class AddToDoActivity extends AppCompatActivity {
 
@@ -35,9 +37,19 @@ public class AddToDoActivity extends AppCompatActivity {
         }
     }
 
-        @Override
-        public boolean onSupportNavigateUp () {
-            onBackPressed();
-            return super.onSupportNavigateUp();
-        }
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return super.onSupportNavigateUp();
     }
+
+    @OnClick(R.id.add_button)
+    public void onClick() {
+        Todo todo = new Todo(contentEditText.getText().toString(), doneCheckbox.isChecked());
+
+        Intent intent = new Intent();
+        intent.putExtra(ToDoListActivity.TODO_EXTRA, todo);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+}
