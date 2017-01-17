@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">ToDoExpert</string>
+    <string name="enter_username">Enter username</string>
+    <string name="password">Enter Password</string>
+    <string name="log_in">Log In</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="username_too_short">Username has to be at least 5 char.</string>
+    <string name="empty_password">Password is empty.</string>
+    <string-array name="sex">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+    <plurals name="kaczki">
+        <item quantity="one">%d kaczki</item>
+        <item quantity="few">%d kaczek</item>
+    </plurals>
+</resources>
